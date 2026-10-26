@@ -2,10 +2,19 @@
 // Mặc định nạp cấu hình từ appsettings.json,
 // Đồng thời chuẩn bị logging, dịch vụ và web server.
 
+using System.Text.Json.Serialization;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Đăng ký các dịch vụ cần thiết để sử dụng controller.
 builder.Services.AddControllers();
+
+// Quy định cách biểu diễn kiểu dữ liệu số trong OpenAPI. - Áp dụng khi swagger không nhận được tham số int
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.NumberHandling =
+        JsonNumberHandling.Strict;  
+});
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 // Đăng ký dịch vụ tạo tài liệu mô tả API theo chuẩn OpenAPI.

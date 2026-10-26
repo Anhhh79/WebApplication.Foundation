@@ -1,6 +1,11 @@
-@Foundation.Api_HostAddress = http://localhost:5264
+@host = https://localhost
+@port = 7296
 
-GET {{Foundation.Api_HostAddress}}/api/status
+@Foundation.Api_HostAddress = https://localhost:7296
+
+GET {{Foundation.Api_HostAddress}}/api/system/ping
 Accept: application/json
-
+ProjectUrl: {{$projectUrl}}
+LocalDate: {{$datetime iso8601}}
 ###
+
