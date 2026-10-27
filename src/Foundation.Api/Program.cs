@@ -2,6 +2,7 @@
 // Mặc định nạp cấu hình từ appsettings.json,
 // Đồng thời chuẩn bị logging, dịch vụ và web server.
 
+using Foundation.Api.Services;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,6 +21,8 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 // Đăng ký dịch vụ tạo tài liệu mô tả API theo chuẩn OpenAPI.
 builder.Services.AddOpenApi();
 
+// Đăng ký DI các service trong ứng dụng.
+builder.Services.AddSingleton<SampleItemService>();
 
 // Tạo ứng dụng từ các dịch vụ và cấu hình đã chuẩn bị.
 var app = builder.Build();
