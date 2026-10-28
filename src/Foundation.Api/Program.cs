@@ -2,7 +2,9 @@
 // Mặc định nạp cấu hình từ appsettings.json,
 // Đồng thời chuẩn bị logging, dịch vụ và web server.
 
+using Foundation.Api.Data;
 using Foundation.Api.Services;
+using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,16 @@ builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.NumberHandling =
         JsonNumberHandling.Strict;  
 });
+
+// Đăng ký dịch vụ Entity Framework Core với SQL Server.
+var connectionString = builder.Configuration
+    .GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "Connection string 'DefaultConnection' not found.");
+
+// Đăng ký DbContext với chuỗi kết nối SQL Server.
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 // Đăng ký dịch vụ tạo tài liệu mô tả API theo chuẩn OpenAPI.
@@ -54,5 +66,5 @@ app.UseAuthorization();
 // Ánh xạ các action trong controller thành endpoint nhận request.
 app.MapControllers();
 
-// Khởi động web server và giữ ứng dụng chạy để nhận request.
-app.Run();
+// Khởi chạy ứng dụng và chờ bất đồng bộ cho đến khi ứng dụng dừng.
+await app.RunAsync();
