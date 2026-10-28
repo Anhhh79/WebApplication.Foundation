@@ -11,5 +11,12 @@ namespace Foundation.Api.Data
 
         public DbSet<SampleItem> SampleItems { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            // Áp dụng cấu hình cho entity SampleItem
+            modelBuilder.ApplyConfiguration(new Configurations.SampleItemConfiguration());
+        }
+
     }
 }
