@@ -3,7 +3,7 @@
 
 @Foundation.Api_HostAddress = https://localhost:7296
 
-GET {{Foundation.Api_HostAddress}}/api/system/ping
+GET {{Foundation.Api_HostAddress}}/api/sample-items
 Accept: application/json
 ProjectUrl: {{$projectUrl}}
 LocalDate: {{$datetime iso8601}}

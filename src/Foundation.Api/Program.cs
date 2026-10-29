@@ -4,6 +4,7 @@
 
 using Foundation.Api.Data;
 using Foundation.Api.Services;
+using Foundation.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -34,7 +35,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddOpenApi();
 
 // Đăng ký DI các service trong ứng dụng.
-builder.Services.AddSingleton<SampleItemService>();
+builder.Services.AddScoped<ISampleItemService, SampleItemService>();
 
 // Tạo ứng dụng từ các dịch vụ và cấu hình đã chuẩn bị.
 var app = builder.Build();

@@ -1,76 +1,66 @@
-﻿using Foundation.Api.Dtos;
+﻿using Foundation.Api.Data;
+using Foundation.Api.Dtos;
 using Foundation.Api.Models;
+using Foundation.Api.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Foundation.Api.Services
 {
-    public class SampleItemService
+    public class SampleItemService : ISampleItemService
     {
-        public Guid InstanceId { get; } = Guid.NewGuid();
-        private readonly List<SampleItem> _lstItem = new List<SampleItem>()
-        {
-            new SampleItem
-            {
-                Id = 1,
-                Name = "Laptop",
-                IsActive = true
-            },
-            new SampleItem
-            {
-                Id = 2,
-                Name = "Mouse",
-                IsActive = true
-            },
-            new SampleItem
-            {
-                Id = 3,
-                Name = "Keyboard",
-                IsActive = false
-            }
-        };
+        private readonly ApplicationDbContext _context;
 
-        public List<SampleItem> GetAll()
+        public SampleItemService(ApplicationDbContext context)
         {
-            return _lstItem;
+            _context = context;
         }
 
-        public SampleItem? GetById(int id)
-        {   
-            return _lstItem.FirstOrDefault(x => x.Id == id);
+        public async Task<List<SampleItem>> GetAllAsync(CancellationToken cancellationToken = default)
+        {
+            var items = await _context.SampleItems.AsNoTracking().ToListAsync(cancellationToken);
+            return items;
         }
 
-        public SampleItem Add(CreateSampleItemRequest item)
+        public async Task<SampleItem?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            int newId = _lstItem.Any() ? _lstItem.Max(i => i.Id) + 1 : 1;
+            var item = await _context.SampleItems.AsNoTracking().FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+            return item;
+        }
+
+        public async Task<SampleItem> CreateAsync(CreateSampleItemRequest item, CancellationToken cancellationToken = default)
+        {
             var newItem = new SampleItem
             {
-                Id = newId,
                 Name = item.Name,
                 IsActive = item.IsActive
             };
-            _lstItem.Add(newItem);
+            _context.SampleItems.Add(newItem);
+            await _context.SaveChangesAsync(cancellationToken);
             return newItem;
         }
 
-        public bool Update(int id,UpdateSampleItemRequest updatedItem)
+        public async Task<bool> UpdateAsync(int id, UpdateSampleItemRequest updatedItem, CancellationToken cancellationToken = default)
         {
-            var existingItem = _lstItem.FirstOrDefault(i => i.Id == id);
+            var existingItem = await _context.SampleItems.FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
             if (existingItem == null)
             {
                 return false;
             }
             existingItem.Name = updatedItem.Name;
             existingItem.IsActive = updatedItem.IsActive;
+            await _context.SaveChangesAsync(cancellationToken);
             return true;
         }
 
-        public bool Delete(int id)
+        public async Task<bool> DeleteAsync(int id, CancellationToken cancellationToken = default)
         {
-            var existingItem = _lstItem.FirstOrDefault(i => i.Id == id);
+            var existingItem = await _context.SampleItems.FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
             if (existingItem == null)
             {
                 return false;
             }
-            _lstItem.Remove(existingItem);
+            _context.SampleItems.Remove(existingItem);
+            await _context.SaveChangesAsync(cancellationToken);
             return true;
         }
     }

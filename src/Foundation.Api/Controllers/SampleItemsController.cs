@@ -1,6 +1,7 @@
 ﻿using Foundation.Api.Dtos;
 using Foundation.Api.Models;
 using Foundation.Api.Services;
+using Foundation.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,25 +11,25 @@ namespace Foundation.Api.Controllers
     [ApiController]
     public class SampleItemsController : ControllerBase
     {
-        private readonly SampleItemService _sampleItemService;
-        public SampleItemsController(SampleItemService sampleItemService)
+        private readonly ISampleItemService _sampleItemService;
+        public SampleItemsController(ISampleItemService sampleItemService)
         {
             _sampleItemService = sampleItemService;
         }
 
         // GET: api/sample-items
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
-            var items = _sampleItemService.GetAll();
+            var items = await _sampleItemService.GetAllAsync(cancellationToken);
             return Ok(items);
         }
 
         // GET: api/sample-items/id
         [HttpGet("{id}")]
-        public IActionResult GetById(int id)
+        public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
         {
-            var item = _sampleItemService.GetById(id);
+            var item = await _sampleItemService.GetByIdAsync(id, cancellationToken);
             if (item == null)
             {
                 return NotFound();
@@ -38,19 +39,19 @@ namespace Foundation.Api.Controllers
 
         // POST: api/sample-items
         [HttpPost]
-        public IActionResult Create([FromBody] CreateSampleItemRequest item)
+        public async Task<IActionResult> Create([FromBody] CreateSampleItemRequest item, CancellationToken cancellationToken)
         {
-            var result = _sampleItemService.Add(item);
+            var result = await _sampleItemService.CreateAsync(item, cancellationToken);
 
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
 
         // PUT: api/sample-items/id
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] UpdateSampleItemRequest item)
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateSampleItemRequest item, CancellationToken cancellationToken)
         {
 
-            var result = _sampleItemService.Update(id, item);   
+            var result = await _sampleItemService.UpdateAsync(id, item, cancellationToken);
 
             if (!result)
             {
@@ -62,9 +63,9 @@ namespace Foundation.Api.Controllers
 
         // DELETE: api/sample-items/id
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
         {
-            var existingItem = _sampleItemService.Delete(id);
+            var existingItem = await _sampleItemService.DeleteAsync(id, cancellationToken);
 
             if (!existingItem)
             {
