@@ -22,7 +22,12 @@ namespace Foundation.Api.Controllers
         public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
         {
             var items = await _sampleItemService.GetAllAsync(cancellationToken);
-            return Ok(items);
+            return Ok(items.Select(i => new SampleItemResponse
+            {
+                Id = i.Id,
+                Name = i.Name,
+                IsActive = i.IsActive
+            }).ToList());
         }
 
         // GET: api/sample-items/id
@@ -34,24 +39,51 @@ namespace Foundation.Api.Controllers
             {
                 return NotFound();
             }
-            return Ok(item);
+            return Ok(new SampleItemResponse
+            {
+                Id = item.Id,
+                Name = item.Name,
+                IsActive = item.IsActive
+            });
         }
 
         // POST: api/sample-items
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateSampleItemRequest item, CancellationToken cancellationToken)
         {
-            var result = await _sampleItemService.CreateAsync(item, cancellationToken);
+            if (item.IsActive == null)
+            {
+                return BadRequest("IsActive field is required.");
+            }
+            var Entity = new SampleItem
+            {
+                Name = item.Name,
+                IsActive = item.IsActive.Value
+            };
+            var result = await _sampleItemService.CreateAsync(Entity, cancellationToken);
 
-            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, new SampleItemResponse
+            {
+                Id = result.Id,
+                Name = result.Name,
+                IsActive = result.IsActive
+            });
         }
 
         // PUT: api/sample-items/id
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateSampleItemRequest item, CancellationToken cancellationToken)
         {
-
-            var result = await _sampleItemService.UpdateAsync(id, item, cancellationToken);
+            if (item.IsActive == null)
+            {
+                return BadRequest("IsActive field is required.");
+            }
+            var Entity = new SampleItem
+            {
+                Name = item.Name,
+                IsActive = item.IsActive.Value
+            };  
+            var result = await _sampleItemService.UpdateAsync(id, Entity, cancellationToken);
 
             if (!result)
             {

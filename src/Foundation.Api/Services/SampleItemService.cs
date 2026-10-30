@@ -27,19 +27,14 @@ namespace Foundation.Api.Services
             return item;
         }
 
-        public async Task<SampleItem> CreateAsync(CreateSampleItemRequest item, CancellationToken cancellationToken = default)
+        public async Task<SampleItem> CreateAsync(SampleItem item, CancellationToken cancellationToken = default)
         {
-            var newItem = new SampleItem
-            {
-                Name = item.Name,
-                IsActive = item.IsActive
-            };
-            _context.SampleItems.Add(newItem);
+            _context.SampleItems.Add(item);
             await _context.SaveChangesAsync(cancellationToken);
-            return newItem;
+            return item;
         }
 
-        public async Task<bool> UpdateAsync(int id, UpdateSampleItemRequest updatedItem, CancellationToken cancellationToken = default)
+        public async Task<bool> UpdateAsync(int id, SampleItem updatedItem, CancellationToken cancellationToken = default)
         {
             var existingItem = await _context.SampleItems.FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
             if (existingItem == null)
