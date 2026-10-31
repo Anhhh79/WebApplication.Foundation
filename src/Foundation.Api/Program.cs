@@ -3,12 +3,18 @@
 // Đồng thời chuẩn bị logging, dịch vụ và web server.
 
 using Foundation.Api.Data;
+using Foundation.Api.ErrorHandling;
 using Foundation.Api.Services;
 using Foundation.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Đăng ký dịch vụ xử lý lỗi toàn cục theo chuẩn RFC 7807.
+builder.Services.AddProblemDetails();
+// Đăng ký dịch vụ xử lý ngoại lệ toàn cục.
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Đăng ký các dịch vụ cần thiết để sử dụng controller.
 builder.Services.AddControllers();
@@ -39,6 +45,11 @@ builder.Services.AddScoped<ISampleItemService, SampleItemService>();
 
 // Tạo ứng dụng từ các dịch vụ và cấu hình đã chuẩn bị.
 var app = builder.Build();
+
+// Thêm bước xử lý ngoại lệ toàn cục và hiển thị trang lỗi.
+app.UseExceptionHandler();
+// Thêm bước hiển thị trang lỗi khi nhận được mã trạng thái HTTP khác 200.
+app.UseStatusCodePages();
 
 // Chỉ cung cấp tài liệu OpenAPI và Swagger UI trong môi trường Development.
 // Configure the HTTP request pipeline.

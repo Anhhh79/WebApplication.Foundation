@@ -62,6 +62,11 @@ namespace Foundation.Api.Controllers
             };
             var result = await _sampleItemService.CreateAsync(Entity, cancellationToken);
 
+            if (result == null)
+            {
+                return Conflict("An item with the same name already exists.");
+            }
+
             return CreatedAtAction(nameof(GetById), new { id = result.Id }, new SampleItemResponse
             {
                 Id = result.Id,
@@ -105,5 +110,6 @@ namespace Foundation.Api.Controllers
             }
             return NoContent();
         }
+
     }
 }

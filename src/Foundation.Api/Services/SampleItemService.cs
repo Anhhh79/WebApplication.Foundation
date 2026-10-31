@@ -27,8 +27,13 @@ namespace Foundation.Api.Services
             return item;
         }
 
-        public async Task<SampleItem> CreateAsync(SampleItem item, CancellationToken cancellationToken = default)
+        public async Task<SampleItem?> CreateAsync(SampleItem item, CancellationToken cancellationToken = default)
         {
+            var existingItem = await _context.SampleItems.FirstOrDefaultAsync(i => i.Name == item.Name, cancellationToken);
+            if (existingItem != null)
+            {
+                return null; 
+            }
             _context.SampleItems.Add(item);
             await _context.SaveChangesAsync(cancellationToken);
             return item;
